@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuid } from 'uuid';
 import { Users } from './users.entity';
 import { UsersRepository } from './users.repository';
-import { Login, Register, UserInfo } from './users.type';
+import { Register } from './users.type';
 import * as Bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  public async addUser(register: Register): Promise<UserInfo> {
+  async addUser(register: Register): Promise<string> {
     const regUser = await this.usersRepository.create();
 
     // Encode User PW
@@ -26,11 +26,16 @@ export class UsersService {
     regUser.userID = uuid();
 
     const user = await this.usersRepository.save(regUser);
-    const userInfo: UserInfo = {
-      userName: user.userName,
-      userEmail: user.userEmail,
-      userID: user.userID,
-    };
-    return userInfo;
+
+    return user.userID;
+  }
+
+  async getUserByEmail(userEmail: string) {
+    const searchedUser = await this.usersRepository.findOne({
+      where: {
+        userEmail: userEmail,
+      },
+    });
+    return searchedUser;
   }
 }

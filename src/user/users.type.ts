@@ -13,4 +13,7 @@ export type UserInfo = {
   userID: string;
   userName: string;
   userEmail: string;
+  userPW: string;
+  userWallet: string;
+  userImgID: string;
 };
