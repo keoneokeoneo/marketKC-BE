@@ -13,7 +13,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async addUser(register: Register): Promise<string> {
+  async addUser(register: Register) {
     const regUser = await this.usersRepository.create();
 
     // Encode User PW
@@ -27,7 +27,10 @@ export class UsersService {
 
     const user = await this.usersRepository.save(regUser);
 
-    return user.userID;
+    return {
+      userEmail: register.userEmail,
+      userPW: register.userPW,
+    };
   }
 
   async getUserByEmail(userEmail: string) {

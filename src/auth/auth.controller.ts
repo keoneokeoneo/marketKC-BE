@@ -48,8 +48,8 @@ export class AuthController {
           .body('이미 사용중인 이메일 주소입니다.')
           .build();
       } else {
-        const newUserID = await this.usersService.addUser(value);
-        return new ResponseMessage().success().body(newUserID).build();
+        const newUserInfo = await this.usersService.addUser(value);
+        return new ResponseMessage().success().body(newUserInfo).build();
       }
     } catch (e) {
       Logger.error(e);
