@@ -41,4 +41,12 @@ export class UsersService {
     });
     return searchedUser;
   }
+
+  async getUserByID(userID: string) {
+    const searchedUser = await this.usersRepository.findOne({
+      where: { userID: userID },
+    });
+
+    return searchedUser;
+  }
 }

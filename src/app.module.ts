@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection, getConnectionOptions } from 'typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
-import { Users } from './user/users.entity';
 import { UsersModule } from './user/users.module';
+import * as ormconfig from './ormconfig';
 
 @Module({
   imports: [
@@ -12,16 +12,7 @@ import { UsersModule } from './user/users.module';
     //   useFactory: async () =>
     //     Object.assign(await getConnectionOptions(), { autoLoadEntities: true }),
     // }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'guswjd13##',
-      database: 'market-kc',
-      entities: [Users],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(ormconfig),
     UsersModule,
     AuthModule,
   ],
