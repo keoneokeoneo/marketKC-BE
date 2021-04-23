@@ -15,11 +15,11 @@ export const loginSchema = Joi.object({
   userPW: Joi.string().required(),
 });
 
-@Controller('auth')
+@Controller('/api/auth')
 export class AuthController {
   constructor(private usersService: UsersService) {}
 
-  @Post('register')
+  @Post('/api/register')
   async addUser(@Body() register: Register): Promise<Response> {
     try {
       console.log(register);

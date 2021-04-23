@@ -4,6 +4,7 @@ import { Connection, getConnectionOptions } from 'typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './user/users.module';
+import { AppGateway } from './app.gateway';
 import * as ormconfig from './ormconfig';
 
 @Module({
@@ -17,7 +18,7 @@ import * as ormconfig from './ormconfig';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppGateway],
 })
 export class AppModule {
   constructor(private readonly connection: Connection) {}
