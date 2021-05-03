@@ -2,7 +2,7 @@ export class ResponseMessage {
   private data: any | any[];
   private code: number;
 
-  public success(): ResponseMessage {
+  public success(code: number): ResponseMessage {
     this.code = 1;
     return this;
   }
