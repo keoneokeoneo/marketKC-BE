@@ -19,7 +19,7 @@ export const loginSchema = Joi.object({
 export class AuthController {
   constructor(private usersService: UsersService) {}
 
-  @Post('/api/register')
+  @Post('/register')
   async addUser(@Body() register: Register): Promise<Response> {
     try {
       console.log(register);
@@ -49,7 +49,7 @@ export class AuthController {
           .build();
       } else {
         const newUserInfo = await this.usersService.addUser(value);
-        return new ResponseMessage().success().body(newUserInfo).build();
+        return new ResponseMessage().success(200).body(newUserInfo).build();
       }
     } catch (e) {
       Logger.error(e);

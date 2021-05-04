@@ -1,3 +1,4 @@
+import { S3_BASE_URL } from 'src/config';
 import {
   Column,
   CreateDateColumn,
@@ -20,11 +21,14 @@ export class Users {
   @Column({ nullable: false })
   userName: string;
 
-  @Column({ length: 40, nullable: false })
-  userWallet: string = '';
+  @Column({ length: 42, nullable: false })
+  userWalletAddr = '';
 
   @Column({ nullable: false })
-  userImgID: string = '';
+  userProfileImgUrl = `${S3_BASE_URL}/profileImgs/default-profile-img.png`;
+
+  @Column({ nullable: false })
+  userLocation = '';
 
   @CreateDateColumn()
   createdAt: Date;
