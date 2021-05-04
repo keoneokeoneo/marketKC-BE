@@ -30,8 +30,8 @@ export class Users {
   })
   userProfileImgUrl: string;
 
-  @Column({ nullable: false, default: '' })
-  userLocation: string;
+  // @Column({ nullable: false, default: '' })
+  // userLocation: string;
 
   @CreateDateColumn()
   createdAt: Date;

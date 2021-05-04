@@ -47,8 +47,14 @@ export class AuthService {
     };
     return {
       access_token: this.jwtService.sign(payload),
+      userName: data.userName,
+      userEmail: data.userEmail,
       userID: data.userID,
-      code: 1,
+      userWalletAddr: data.userWalletAddr,
+      userProfileImgUrl: data.userProfileImgUrl,
+      userCreatedAt: data.createdAt,
+      userUpdatedAt: data.updatedAt,
+      code: 200,
     };
   }
 }
