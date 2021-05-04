@@ -21,14 +21,17 @@ export class Users {
   @Column({ nullable: false })
   userName: string;
 
-  @Column({ length: 42, nullable: false })
-  userWalletAddr = '';
+  @Column({ length: 42, nullable: false, default: '' })
+  userWalletAddr: string;
 
-  @Column({ nullable: false })
-  userProfileImgUrl = `${S3_BASE_URL}/profileImgs/default-profile-img.png`;
+  @Column({
+    nullable: false,
+    default: `${S3_BASE_URL}/profileImgs/default-profile-img.png`,
+  })
+  userProfileImgUrl: string;
 
-  @Column({ nullable: false })
-  userLocation = '';
+  @Column({ nullable: false, default: '' })
+  userLocation: string;
 
   @CreateDateColumn()
   createdAt: Date;
