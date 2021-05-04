@@ -3,10 +3,13 @@ import { ConnectionOptions } from 'typeorm';
 export const ormConfig: ConnectionOptions = {
   type: 'mysql',
   host: 'market-kc-db.ch0t1vd4iruk.ap-northeast-2.rds.amazonaws.com',
-  port: 3306,
   username: 'keonho',
   password: 'Keonho1996^^',
+  //host: '127.0.0.1',
+  //username: 'root',
+  //password: 'guswjd13##',
   database: 'market-kc',
+  port: 3306,
   entities: ['dist/**/*.entity{.ts,.js}'],
   synchronize: true,
 };

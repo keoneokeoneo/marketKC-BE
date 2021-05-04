@@ -6,7 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './user/users.module';
 import { AppGateway } from './app.gateway';
 import { ormConfig } from './config';
-import { AppService } from './app.service';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -17,9 +17,10 @@ import { AppService } from './app.service';
     TypeOrmModule.forRoot(ormConfig),
     UsersModule,
     AuthModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {
   constructor(private readonly connection: Connection) {}
