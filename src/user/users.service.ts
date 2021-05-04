@@ -25,12 +25,7 @@ export class UsersService {
     regUser.userPW = pw;
     regUser.userID = uuid();
 
-    const user = await this.usersRepository.save(regUser);
-
-    return {
-      userEmail: register.userEmail,
-      userPW: register.userPW,
-    };
+    await this.usersRepository.save(regUser);
   }
 
   async getUserByEmail(userEmail: string) {
