@@ -31,14 +31,14 @@ export class PostsController {
       if (error) {
         Logger.error(error);
         return new ResponseMessage()
-          .error()
+          .error(999)
           .body('Parameter Error : Wrong Params')
           .build();
       }
 
       const newPost = await this.postsService.addPost(value);
 
-      return new ResponseMessage().success().body(newPost).build();
+      return new ResponseMessage().success(200).body(newPost).build();
     } catch (e) {
       Logger.error(e);
     }
