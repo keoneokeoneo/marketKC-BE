@@ -19,7 +19,7 @@ import { AppService } from './app.service';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppGateway, AppService],
+  providers: [AppService],
 })
 export class AppModule {
   constructor(private readonly connection: Connection) {}
