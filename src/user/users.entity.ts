@@ -33,9 +33,9 @@ export class Users {
   // @Column({ nullable: false, default: '' })
   // userLocation: string;
 
-  @CreateDateColumn()
+  @Column('datetime')
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @Column('datetime')
   updatedAt: Date;
 }

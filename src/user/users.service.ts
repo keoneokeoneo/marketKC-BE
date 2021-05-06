@@ -19,11 +19,14 @@ export class UsersService {
     // Encode User PW
     const salt: string = await Bcrypt.genSalt(10);
     const pw: string = await Bcrypt.hash(register.userPW, salt);
+    const date = new Date(Date.now());
 
     regUser.userName = register.userName;
     regUser.userEmail = register.userEmail;
     regUser.userPW = pw;
     regUser.userID = uuid();
+    regUser.createdAt = date;
+    regUser.updatedAt = date;
 
     await this.usersRepository.save(regUser);
   }
@@ -43,5 +46,12 @@ export class UsersService {
     });
 
     return searchedUser;
+  }
+
+  async updateLastActivity(userID: string) {
+    await this.usersRepository.update(
+      { userID: userID },
+      { updatedAt: new Date(Date.now()) },
+    );
   }
 }

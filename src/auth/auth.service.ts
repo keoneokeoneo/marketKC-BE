@@ -38,13 +38,16 @@ export class AuthService {
   }
 
   async login(data: any) {
-    console.log(data);
+    //console.log(data);
     if (!(data instanceof Users)) return data;
     const payload = {
       userEmail: data.userEmail,
       userName: data.userName,
       userID: data.userID,
     };
+
+    await this.usersService.updateLastActivity(data.userID);
+
     return {
       access_token: this.jwtService.sign(payload),
       userName: data.userName,
