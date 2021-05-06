@@ -27,6 +27,10 @@ export class UsersService {
     regUser.userID = uuid();
     regUser.createdAt = date;
     regUser.updatedAt = date;
+    regUser.subscribedCategories = [1, 2, 3];
+
+    const test = [1, 2, 3];
+    console.log(typeof test, test);
 
     await this.usersRepository.save(regUser);
   }

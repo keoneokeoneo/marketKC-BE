@@ -48,15 +48,18 @@ export class AuthService {
 
     await this.usersService.updateLastActivity(data.userID);
 
+    const newUser = await this.usersService.getUserByID(data.userID);
+
     return {
       access_token: this.jwtService.sign(payload),
-      userName: data.userName,
-      userEmail: data.userEmail,
-      userID: data.userID,
-      userWalletAddr: data.userWalletAddr,
-      userProfileImgUrl: data.userProfileImgUrl,
-      userCreatedAt: data.createdAt,
-      userUpdatedAt: data.updatedAt,
+      userName: newUser.userName,
+      userEmail: newUser.userEmail,
+      userID: newUser.userID,
+      userWalletAddr: newUser.userWalletAddr,
+      userProfileImgUrl: newUser.userProfileImgUrl,
+      userCreatedAt: newUser.createdAt,
+      userUpdatedAt: newUser.updatedAt,
+      subscribedCategories: newUser.subscribedCategories,
       code: 200,
     };
   }

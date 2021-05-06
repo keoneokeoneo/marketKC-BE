@@ -38,4 +38,7 @@ export class Users {
 
   @Column('datetime')
   updatedAt: Date;
+
+  @Column('simple-array')
+  subscribedCategories: number[];
 }
