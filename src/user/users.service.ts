@@ -5,12 +5,14 @@ import { Users } from './users.entity';
 import { UsersRepository } from './users.repository';
 import { Register } from './users.type';
 import * as Bcrypt from 'bcryptjs';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(Users)
     private readonly usersRepository: UsersRepository,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async addUser(register: Register) {
@@ -21,16 +23,19 @@ export class UsersService {
     const pw: string = await Bcrypt.hash(register.userPW, salt);
     const date = new Date(Date.now());
 
+    const categories = await this.categoriesService.getAllCategories();
+    const userCategories = [];
+    categories.forEach((category) => userCategories.push(category.categoryID));
+
+    console.log(userCategories);
+
     regUser.userName = register.userName;
     regUser.userEmail = register.userEmail;
     regUser.userPW = pw;
     regUser.userID = uuid();
     regUser.createdAt = date;
     regUser.updatedAt = date;
-    regUser.subscribedCategories = [1, 2, 3];
-
-    const test = [1, 2, 3];
-    console.log(typeof test, test);
+    regUser.subscribedCategories = userCategories;
 
     await this.usersRepository.save(regUser);
   }

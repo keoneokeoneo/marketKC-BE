@@ -48,11 +48,8 @@ export class AuthController {
           .body('이미 사용중인 이메일 주소입니다.')
           .build();
       } else {
-        await this.usersService.addUser(value);
-        return new ResponseMessage()
-          .success(200)
-          .body('회원가입에 성공했습니다.')
-          .build();
+        const res = await this.usersService.addUser(value);
+        return new ResponseMessage().success(200).body(res).build();
       }
     } catch (e) {
       Logger.error(e);
