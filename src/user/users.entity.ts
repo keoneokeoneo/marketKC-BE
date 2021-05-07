@@ -33,10 +33,10 @@ export class Users {
   // @Column({ nullable: false, default: '' })
   // userLocation: string;
 
-  @Column('datetime')
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column('datetime')
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @Column('simple-array')

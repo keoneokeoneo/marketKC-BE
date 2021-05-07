@@ -63,4 +63,13 @@ export class UsersService {
       { updatedAt: new Date(Date.now()) },
     );
   }
+
+  async updateUserSubscribedCategories(userID: string, categories: number[]) {
+    const searchedUser = await this.usersRepository.findOne({
+      where: { userID: userID },
+    });
+    searchedUser.subscribedCategories = categories;
+
+    return await this.usersRepository.save(searchedUser);
+  }
 }
