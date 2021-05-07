@@ -30,23 +30,21 @@ export class UsersController {
   async getUserData(@Param('userID') userID: string) {
     try {
       const searchedUser = await this.usersService.getUserByID(userID);
-      //console.log(searchedUser);
 
-      const a = {
-        user: {
-          userID: searchedUser.userID,
-          userEmail: searchedUser.userEmail,
-          userName: searchedUser.userName,
-          userWalletAddr: searchedUser.userWalletAddr,
-          userProfileImgUrl: searchedUser.userProfileImgUrl,
-          createdAt: searchedUser.createdAt,
-          updatedAt: searchedUser.updatedAt,
-        },
-        userCategories: searchedUser.subscribedCategories.toString(),
+      const res = {
+        userID: searchedUser.userID,
+        userEmail: searchedUser.userEmail,
+        userName: searchedUser.userName,
+        userWalletAddr: searchedUser.userWalletAddr,
+        userProfileImgUrl: searchedUser.userProfileImgUrl,
+        createdAt: searchedUser.createdAt,
+        updatedAt: searchedUser.updatedAt,
+        subscribedCategories: searchedUser.subscribedCategories,
+        test: searchedUser.subscribedCategories.toString(),
       };
 
       if (searchedUser) {
-        return new ResponseMessage().success(200).body(a).build();
+        return new ResponseMessage().success(200).body(res).build();
       } else {
         return new ResponseMessage()
           .error(999)
