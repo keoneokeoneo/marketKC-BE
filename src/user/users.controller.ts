@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Logger, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ResponseMessage } from 'src/response.util';
 import { UsersService } from './users.service';
 
@@ -8,6 +16,15 @@ export class UsersController {
 
   @Put('/setCategories')
   async updateSubscribedCategories() {}
+
+  @Put('/updateLastActivity/:userID')
+  async updateLastActivity(@Param('userID') userID: string) {
+    try {
+      await this.usersService.updateLastActivity(userID);
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
 
   @Get('/:userID')
   async getUserData(@Param('userID') userID: string) {
