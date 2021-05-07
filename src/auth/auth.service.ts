@@ -52,14 +52,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
-      userName: newUser.userName,
-      userEmail: newUser.userEmail,
       userID: newUser.userID,
-      userWalletAddr: newUser.userWalletAddr,
-      userProfileImgUrl: newUser.userProfileImgUrl,
-      userCreatedAt: newUser.createdAt,
-      userUpdatedAt: newUser.updatedAt,
-      subscribedCategories: newUser.subscribedCategories,
       code: 200,
     };
   }
