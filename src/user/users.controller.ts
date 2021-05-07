@@ -33,14 +33,16 @@ export class UsersController {
       //console.log(searchedUser);
 
       const a = {
-        userID: searchedUser.userID,
-        userEmail: searchedUser.userEmail,
-        userName: searchedUser.userName,
-        userWalletAddr: searchedUser.userWalletAddr,
-        userProfileImgUrl: searchedUser.userProfileImgUrl,
-        createdAt: searchedUser.createdAt,
-        updatedAt: searchedUser.updatedAt,
-        subscribedCategories: searchedUser.subscribedCategories.toString(),
+        user: {
+          userID: searchedUser.userID,
+          userEmail: searchedUser.userEmail,
+          userName: searchedUser.userName,
+          userWalletAddr: searchedUser.userWalletAddr,
+          userProfileImgUrl: searchedUser.userProfileImgUrl,
+          createdAt: searchedUser.createdAt,
+          updatedAt: searchedUser.updatedAt,
+        },
+        userCategories: searchedUser.subscribedCategories.toString(),
       };
 
       if (searchedUser) {
