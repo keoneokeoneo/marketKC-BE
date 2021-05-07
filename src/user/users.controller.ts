@@ -13,10 +13,21 @@ export class UsersController {
   async getUserData(@Param('userID') userID: string) {
     try {
       const searchedUser = await this.usersService.getUserByID(userID);
-      console.log(searchedUser);
+      //console.log(searchedUser);
+
+      const a = {
+        userID: searchedUser.userID,
+        userEmail: searchedUser.userEmail,
+        userName: searchedUser.userName,
+        userWalletAddr: searchedUser.userWalletAddr,
+        userProfileImgUrl: searchedUser.userProfileImgUrl,
+        createdAt: searchedUser.createdAt,
+        updatedAt: searchedUser.updatedAt,
+        subscribedCategories: searchedUser.subscribedCategories.toString(),
+      };
 
       if (searchedUser) {
-        return new ResponseMessage().success(200).body(searchedUser).build();
+        return new ResponseMessage().success(200).body(a).build();
       } else {
         return new ResponseMessage()
           .error(999)
