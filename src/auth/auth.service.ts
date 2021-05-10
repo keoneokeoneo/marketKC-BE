@@ -19,7 +19,7 @@ export class AuthService {
         // 해당 유저 정보가 존재하지 않음
         return {
           code: HttpStatus.NOT_FOUND,
-          message: '해당 유저 정보가 존재하지 않습니다.',
+          message: '가입된 계정이 아닙니다.',
         };
       }
 

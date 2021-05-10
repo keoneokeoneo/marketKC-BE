@@ -1,12 +1,13 @@
 import {
   Controller,
   Get,
-  HttpException,
   HttpStatus,
   Logger,
   Param,
   Put,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { UserService } from './user.service';
 
 @Controller('/api/users')
@@ -23,7 +24,7 @@ export class UserController {
   }
 
   @Get('/:id')
-  async getUserData(@Param('id') id: string) {
+  async getUserData(@Param('id') id: string, @Res() res: Response) {
     try {
       const searchedUser = await this.userService.getUserByID(id);
 
@@ -39,16 +40,12 @@ export class UserController {
           updatedAt: searchedUser.updatedAt,
           subscribedCategories: searchedUser.subscribedCategories.toString(),
         };
-        return result;
+        return res.status(HttpStatus.OK).send(result);
       } else {
         // 검색된 유저가 없음 -> 에러 메세지 전달 (404, not found)
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: '검색된 유저 정보가 없습니다.',
-          },
-          HttpStatus.NOT_FOUND,
-        );
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send('해당 유저 정보가 존재하지 않습니다.');
       }
     } catch (e) {
       Logger.error(e);
