@@ -82,7 +82,7 @@ export class UserService {
     try {
       return await this.userRepository.update(
         { id: id },
-        { subscribedCategories: categories },
+        { subscribedCategories: categories, updatedAt: new Date(Date.now()) },
       );
     } catch (e) {
       Logger.error(e);
