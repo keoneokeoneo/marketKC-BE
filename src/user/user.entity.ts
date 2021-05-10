@@ -7,31 +7,28 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('Users')
-export class Users {
+@Entity('User')
+export class User {
   @PrimaryGeneratedColumn('uuid')
-  userID: string;
+  id: string;
 
   @Column({ nullable: false })
-  userEmail: string;
+  email: string;
 
   @Column({ nullable: false })
-  userPW: string;
+  password: string;
 
   @Column({ nullable: false })
-  userName: string;
+  name: string;
 
   @Column({ length: 42, nullable: false, default: '' })
-  userWalletAddr: string;
+  walletAddr: string;
 
   @Column({
     nullable: false,
     default: `${S3_BASE_URL}/profileImgs/default-profile-img.png`,
   })
-  userProfileImgUrl: string;
-
-  // @Column({ nullable: false, default: '' })
-  // userLocation: string;
+  profileImgUrl: string;
 
   @CreateDateColumn()
   createdAt: Date;

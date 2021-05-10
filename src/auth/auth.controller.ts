@@ -1,28 +1,34 @@
-import { Body, Controller, Logger, Post } from '@nestjs/common';
-import { UsersService } from 'src/user/users.service';
-import { Register } from 'src/user/users.type';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Logger,
+  Post,
+  Res,
+} from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
+import { Register } from 'src/user/user.type';
 import * as Joi from 'joi';
-import { ResponseMessage, Response } from 'src/response.util';
+import { Response } from 'express';
 
 export const regSchema = Joi.object({
-  userEmail: Joi.string().required(),
-  userName: Joi.string().required(),
-  userPW: Joi.string().required(),
+  email: Joi.string().required(),
+  name: Joi.string().required(),
+  password: Joi.string().required(),
 });
 
 export const loginSchema = Joi.object({
-  userEmail: Joi.string().required(),
-  userPW: Joi.string().required(),
+  email: Joi.string().required(),
+  password: Joi.string().required(),
 });
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private usersService: UsersService) {}
+  constructor(private userService: UserService) {}
 
   @Post('/register')
-  async addUser(@Body() register: Register): Promise<Response> {
+  async addUser(@Body() register: Register, @Res() res: Response) {
     try {
-      console.log(register);
       const {
         value,
         error,
@@ -32,24 +38,18 @@ export class AuthController {
 
       if (error) {
         Logger.error(error);
-        return new ResponseMessage()
-          .error(999)
-          .body('Parameter Error : Wrong Params')
-          .build();
+        return res.status(HttpStatus.BAD_REQUEST).send(error);
       }
 
-      const searchedRes = await this.usersService.getUserByEmail(
-        value.userEmail,
-      );
+      const searchedUser = await this.userService.getUserByEmail(value.email);
 
-      if (searchedRes !== undefined) {
-        return new ResponseMessage()
-          .error(100)
-          .body('이미 사용중인 이메일 주소입니다.')
-          .build();
+      if (searchedUser) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .send('이미 사용중인 이메일입니다.');
       } else {
-        const res = await this.usersService.addUser(value);
-        return new ResponseMessage().success(200).body(res).build();
+        const newUser = await this.userService.addUser(register);
+        return res.status(HttpStatus.OK).json(newUser);
       }
     } catch (e) {
       Logger.error(e);

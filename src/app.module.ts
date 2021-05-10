@@ -3,10 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './user/users.module';
+import { UserModule } from './user/user.module';
 import { AppGateway } from './app.gateway';
 import { ormConfig } from './config';
-import { CategoriesModule } from './categories/categories.module';
+import { CategoryModule } from './category/category.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -15,9 +16,10 @@ import { CategoriesModule } from './categories/categories.module';
     //     Object.assign(await getConnectionOptions(), { autoLoadEntities: true }),
     // }),
     TypeOrmModule.forRoot(ormConfig),
-    UsersModule,
+    UserModule,
     AuthModule,
-    CategoriesModule,
+    CategoryModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [],

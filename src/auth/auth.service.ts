@@ -1,59 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { UsersService } from 'src/user/users.service';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
 import * as Bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { ResponseMessage, Response } from 'src/response.util';
-import { Users } from 'src/user/users.entity';
+import { User } from 'src/user/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(
-    userEmail: string,
-    userPW: string,
-  ): Promise<Response | Users> {
-    const user = await this.usersService.getUserByEmail(userEmail);
-    if (user === undefined) {
-      // 데이터에 맞는 유저가 db에 없음
-      return new ResponseMessage()
-        .error(999)
-        .body('가입된 계정이 없습니다')
-        .build();
-    }
-    const pwCheck = await Bcrypt.compare(userPW, user.userPW);
+  async validateUser(email: string, password: string) {
+    try {
+      const searchedUser = await this.userService.getUserByEmail(email);
 
-    if (!pwCheck) {
-      // db에 있는 password와 입력한 password가 다름
-      return new ResponseMessage()
-        .error(888)
-        .body('이메일/비밀번호를 확인해주세요')
-        .build();
-    }
+      if (!searchedUser) {
+        // 해당 유저 정보가 존재하지 않음
+        return {
+          code: HttpStatus.NOT_FOUND,
+          message: '해당 유저 정보가 존재하지 않습니다.',
+        };
+      }
 
-    return user;
+      const pwCheck = await Bcrypt.compare(password, searchedUser.password);
+
+      if (!pwCheck) {
+        // db에 있는 password와 입력한 password가 다름
+        return {
+          code: HttpStatus.BAD_REQUEST,
+          message: '비밀번호가 일치하지 않습니다.',
+        };
+      }
+
+      return searchedUser;
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 
-  async login(data: any) {
-    //console.log(data);
-    if (!(data instanceof Users)) return data;
-    const payload = {
-      userEmail: data.userEmail,
-      userName: data.userName,
-      userID: data.userID,
-    };
+  async login(data: User) {
+    try {
+      const payload = {
+        email: data.email,
+        name: data.name,
+        id: data.id,
+      };
 
-    await this.usersService.updateLastActivity(data.userID);
+      await this.userService.updateLastActivity(data.id);
 
-    const newUser = await this.usersService.getUserByID(data.userID);
+      const newUser = await this.userService.getUserByID(data.id);
 
-    return {
-      access_token: this.jwtService.sign(payload),
-      userID: newUser.userID,
-      code: 200,
-    };
+      return {
+        access_token: this.jwtService.sign(payload),
+        id: newUser.id,
+      };
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 }

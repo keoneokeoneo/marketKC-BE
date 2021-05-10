@@ -1,8 +1,7 @@
 import { Body, Controller, Logger, Post } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { PostData } from './posts.type';
+import { PostService } from './post.service';
+import { PostData } from './post.type';
 import * as Joi from 'joi';
-import { ResponseMessage } from 'src/response.util';
 
 export const postSchema = Joi.object({
   postTitle: Joi.string().required(),
@@ -14,8 +13,8 @@ export const postSchema = Joi.object({
 });
 
 @Controller('/api/post')
-export class PostsController {
-  constructor(private postsService: PostsService) {}
+export class PostController {
+  constructor(private postService: PostService) {}
 
   @Post('/add')
   async addPost(@Body() post: PostData) {
@@ -30,15 +29,11 @@ export class PostsController {
 
       if (error) {
         Logger.error(error);
-        return new ResponseMessage()
-          .error(999)
-          .body('Parameter Error : Wrong Params')
-          .build();
       }
 
-      const newPost = await this.postsService.addPost(value);
+      const newPost = await this.postService.addPost(value);
 
-      return new ResponseMessage().success(200).body(newPost).build();
+      // 성공
     } catch (e) {
       Logger.error(e);
     }
