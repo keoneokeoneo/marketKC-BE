@@ -18,3 +18,8 @@ export type UserInfo = {
   profileImgUrl: string;
   subcribedCategories: number[];
 };
+
+export type UpdateUserCategory = {
+  id: string;
+  ids: number[];
+};

@@ -78,12 +78,14 @@ export class UserService {
     }
   }
 
-  async updateUserSubscribedCategories(id: string, categories: number[]) {
-    const searchedUser = await this.userRepository.findOne({
-      where: { id: id },
-    });
-    searchedUser.subscribedCategories = categories;
-
-    return await this.userRepository.save(searchedUser);
+  async updateUserCategories(id: string, categories: number[]) {
+    try {
+      return await this.userRepository.update(
+        { id: id },
+        { subscribedCategories: categories },
+      );
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 }

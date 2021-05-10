@@ -1,14 +1,17 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
   Logger,
   Param,
+  Patch,
   Put,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
+import { UpdateUserCategory } from './user.type';
 
 @Controller('/api/users')
 export class UserController {
@@ -47,6 +50,31 @@ export class UserController {
           .status(HttpStatus.NOT_FOUND)
           .send('해당 유저 정보가 존재하지 않습니다.');
       }
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  @Patch('/:id/categories')
+  async updateUserCategories(
+    @Param('id') id: string,
+    @Body() ids: number[],
+    @Res() res: Response,
+  ) {
+    console.log('update categories call : ', id, ids);
+    try {
+      const user = await this.userService.getUserByID(id);
+
+      if (!user)
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send('해당 유저 정보가 존재하지 않습니다.');
+
+      const result = await this.userService.updateUserCategories(id, ids);
+
+      console.log(result);
+
+      return res.status(HttpStatus.OK).send('수정 성공');
     } catch (e) {
       Logger.error(e);
     }
