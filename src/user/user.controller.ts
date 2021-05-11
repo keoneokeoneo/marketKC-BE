@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
-import { UpdateUserCategory } from './user.type';
 
 @Controller('/api/users')
 export class UserController {

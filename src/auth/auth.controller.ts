@@ -49,7 +49,7 @@ export class AuthController {
           .send('이미 사용중인 이메일입니다.');
       } else {
         const newUser = await this.userService.addUser(register);
-        return res.status(HttpStatus.CREATED).send('회원가입에 성공했습니다.');
+        return res.status(HttpStatus.CREATED).send(newUser);
       }
     } catch (e) {
       Logger.error(e);

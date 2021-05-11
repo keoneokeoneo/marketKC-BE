@@ -1,13 +1,15 @@
 import { S3_BASE_URL } from 'src/config';
+import { Post } from 'src/post/post.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('User')
+@Entity('Users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -38,4 +40,9 @@ export class User {
 
   @Column('simple-array')
   subscribedCategories: number[];
+
+  @OneToMany(() => Post, (post) => post.user, {
+    cascade: true,
+  })
+  posts: Post[];
 }

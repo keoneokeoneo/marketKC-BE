@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from './post.entity';
 
-@Entity('PostImg')
+@Entity('PostImgs')
 export class PostImg {
   @PrimaryGeneratedColumn('increment')
   id: number;
@@ -9,6 +9,8 @@ export class PostImg {
   @Column({ length: 255, nullable: false })
   url: string;
 
-  @ManyToOne(() => Post, (post) => post.id)
+  @ManyToOne(() => Post, (post) => post.postImgs, {
+    onDelete: 'CASCADE',
+  })
   post: Post;
 }

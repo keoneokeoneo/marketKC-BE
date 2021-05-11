@@ -1,10 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Post } from 'src/post/post.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('Category')
+@Entity('Categories')
 export class Category {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column()
   name: string;
+
+  @OneToMany(() => Post, (post) => post.category)
+  post: Post;
 }

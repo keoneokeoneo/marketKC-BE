@@ -1,20 +1,21 @@
+import { Category } from 'src/category/category.entity';
+import { User } from 'src/user/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { PostImg } from './postImg.entity';
 
-@Entity('Post')
+@Entity('Posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ nullable: false })
-  writer: string; // Seller ID
 
   @Column({ length: 100, nullable: false })
   title: string;
@@ -25,11 +26,8 @@ export class Post {
   @Column('int')
   price: number;
 
-  @Column()
-  category: number;
-
-  @Column({ length: 255 })
-  constractAddr: string;
+  @Column({ length: 255, default: '' })
+  contractAddr: string;
 
   @Column({ default: 0 })
   likes: number;
@@ -43,8 +41,8 @@ export class Post {
   @Column({ length: 255, nullable: false })
   location: string;
 
-  @Column({ default: 0 })
-  status: number; // 판매중/거래중/거래완료
+  @Column({ default: '판매중' })
+  status: '판매중' | '거래중' | '거래완료'; // 판매중/거래중/거래완료
 
   @CreateDateColumn()
   createdAt: Date;
@@ -52,6 +50,14 @@ export class Post {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => PostImg, (postImg) => postImg.id)
+  @ManyToOne(() => User, (user) => user.posts, {
+    onDelete: 'CASCADE',
+  })
+  user: User;
+
+  @ManyToOne(() => Category, (category) => category.post)
+  category: Category;
+
+  @OneToMany(() => PostImg, (postImg) => postImg.post, { cascade: true })
   postImgs: PostImg[];
 }

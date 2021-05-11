@@ -7,11 +7,13 @@ import {
   Logger,
   HttpStatus,
   Res,
+  Body,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
+import { Category } from './category/category.entity';
 import { CategoryService } from './category/category.service';
 import { User } from './user/user.entity';
 
@@ -34,6 +36,17 @@ export class AppController {
           .status(HttpStatus.NOT_FOUND)
           .send('서버에 저장된 카테고리가 없습니다.');
       }
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  @Post('/api/categories')
+  async addCategories(@Body() data: Category[], @Res() res: Response) {
+    try {
+      const result = await this.categoryService.addCategories(data);
+
+      if (result) res.status(201).send('카테고리 추가 성공');
     } catch (e) {
       Logger.error(e);
     }
