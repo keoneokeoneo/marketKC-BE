@@ -60,7 +60,7 @@ export class PostController {
     }
   }
 
-  @Post('/add')
+  @Post()
   async addPost(@Body() post: UploadPost, @Res() res: Response) {
     try {
       const {
