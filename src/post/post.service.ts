@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { string } from 'joi';
+import { userInfo } from 'node:os';
 import { Category } from 'src/category/category.entity';
 import { User } from 'src/user/user.entity';
 import { Post } from './post.entity';
@@ -15,15 +17,32 @@ export class PostService {
   ) {}
 
   async getPost(id: number) {
-    try {
-      const res = await this.postRepository.findOne(id, {
-        relations: ['category', 'user', 'postImgs'],
-      });
+    const res = await this.postRepository.findOne(id, {
+      relations: ['category', 'user', 'postImgs'],
+    });
 
-      return res;
-    } catch (e) {
-      Logger.error(e);
-    }
+    const tmp = res.location.split(' ');
+
+    await this.postRepository.update({ id: id }, { views: res.views + 1 });
+
+    return {
+      id: res.id,
+      title: res.title,
+      content: res.content,
+      price: res.price,
+      likes: res.likes,
+      chats: res.chats,
+      views: res.views + 1,
+      location: `${tmp[1]} ${tmp[2]}`,
+      updatedAt: res.updatedAt,
+      categoryName: res.category.name,
+      user: {
+        id: res.user.id,
+        name: res.user.name,
+        profileImgUrl: res.user.profileImgUrl,
+      },
+      postImgs: res.postImgs,
+    };
   }
 
   async getFeedPosts() {
@@ -40,13 +59,6 @@ export class PostService {
           'likes',
         ],
         relations: ['postImgs'],
-        // where: [
-        //   {
-        //     category: {
-        //       id: 5,
-        //     },
-        //   },
-        // ],
       });
 
       return {
