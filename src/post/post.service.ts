@@ -16,33 +16,14 @@ export class PostService {
     private postRepository: PostRepository,
   ) {}
 
+  async updateView(id: number, prev: number) {
+    return await this.postRepository.update({ id: id }, { views: prev + 1 });
+  }
+
   async getPost(id: number) {
-    const res = await this.postRepository.findOne(id, {
+    return await this.postRepository.findOne(id, {
       relations: ['category', 'user', 'postImgs'],
     });
-
-    const tmp = res.location.split(' ');
-
-    await this.postRepository.update({ id: id }, { views: res.views + 1 });
-
-    return {
-      id: res.id,
-      title: res.title,
-      content: res.content,
-      price: res.price,
-      likes: res.likes,
-      chats: res.chats,
-      views: res.views + 1,
-      location: `${tmp[1]} ${tmp[2]}`,
-      updatedAt: res.updatedAt,
-      categoryName: res.category.name,
-      user: {
-        id: res.user.id,
-        name: res.user.name,
-        profileImgUrl: res.user.profileImgUrl,
-      },
-      postImgs: res.postImgs,
-    };
   }
 
   async getFeedPosts() {

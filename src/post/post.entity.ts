@@ -44,10 +44,10 @@ export class Post {
   @Column({ default: '판매중' })
   status: '판매중' | '거래중' | '거래완료'; // 판매중/거래중/거래완료
 
-  @CreateDateColumn()
+  @Column({ type: 'datetime', precision: 6 })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @Column({ type: 'datetime', precision: 6 })
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.posts, {

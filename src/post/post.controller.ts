@@ -14,6 +14,7 @@ import * as Joi from 'joi';
 import { Response } from 'express';
 import { UserService } from 'src/user/user.service';
 import { CategoryService } from 'src/category/category.service';
+import { getDiff } from 'src/dateFormat';
 
 export const postSchema = Joi.object({
   title: Joi.string().required(),
@@ -47,12 +48,35 @@ export class PostController {
   @Get('/:id')
   async getPost(@Param('id') id: number, @Res() res: Response) {
     try {
-      const result = await this.postService.getPost(id);
+      const post = await this.postService.getPost(id);
 
-      if (!result)
-        res
+      if (!post)
+        return res
           .status(HttpStatus.NOT_FOUND)
           .send('해당 게시글이 존재하지 않습니다.');
+
+      await this.postService.updateView(id, post.views); // 조회했으므로 뷰 증가
+
+      const tmp = post.location.split(' ');
+
+      const result = {
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        price: post.price,
+        likes: post.likes,
+        chats: post.chats,
+        views: post.views + 1,
+        location: `${tmp[1]} ${tmp[2]}`,
+        updatedAt: getDiff(post.updatedAt),
+        categoryName: post.category.name,
+        user: {
+          id: post.user.id,
+          name: post.user.name,
+          profileImgUrl: post.user.profileImgUrl,
+        },
+        postImgs: post.postImgs,
+      };
 
       return res.status(HttpStatus.OK).send(result);
     } catch (e) {
@@ -83,8 +107,6 @@ export class PostController {
           .status(HttpStatus.NOT_FOUND)
           .send('해당 유저 정보가 없습니다.');
 
-      console.log('작성자 정보 : ', user);
-
       const category = await this.categoryService.getCategoryByID(
         post.categoryID,
       );
@@ -92,15 +114,10 @@ export class PostController {
         return res
           .status(HttpStatus.NOT_FOUND)
           .send('해당 카테고리 정보가 없습니다.');
-      console.log('게시글 카테고리 정보 : ', category);
-
       // 포스트 먼저 생성 - id값 참조를 해야 함
       const newPost = await this.postService.addPost(value, user, category);
-      console.log('생성된 post : ', newPost);
 
       return res.status(HttpStatus.CREATED).send(newPost);
-
-      // 성공
     } catch (e) {
       Logger.error(e);
     }
