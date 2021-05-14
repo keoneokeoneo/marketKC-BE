@@ -48,8 +48,8 @@ export class AuthController {
           .status(HttpStatus.BAD_REQUEST)
           .send('이미 사용중인 이메일입니다.');
       } else {
-        const newUser = await this.userService.addUser(register);
-        return res.status(HttpStatus.CREATED).send(newUser);
+        await this.userService.addUser(register);
+        return res.status(HttpStatus.CREATED).send('로그인 성공');
       }
     } catch (e) {
       Logger.error(e);
