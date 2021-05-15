@@ -1,5 +1,7 @@
 import { S3_BASE_URL } from 'src/config';
 import { Post } from 'src/post/post.entity';
+import { ChatRoom } from 'src/socket/chatroom.entity';
+import { Message } from 'src/socket/message.entity';
 import {
   Column,
   CreateDateColumn,
@@ -45,4 +47,17 @@ export class User {
     cascade: true,
   })
   posts: Post[];
+
+  @OneToMany(() => ChatRoom, (buyingChat) => buyingChat.buyer, {
+    cascade: true,
+  })
+  buyingChats: ChatRoom[];
+
+  @OneToMany(() => ChatRoom, (sellingChat) => sellingChat.seller, {
+    cascade: true,
+  })
+  sellingChats: ChatRoom[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
 }

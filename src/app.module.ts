@@ -8,6 +8,7 @@ import { AppGateway } from './app.gateway';
 import { ormConfig } from './config';
 import { CategoryModule } from './category/category.module';
 import { PostModule } from './post/post.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PostModule } from './post/post.module';
     AuthModule,
     CategoryModule,
     PostModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [AppGateway],

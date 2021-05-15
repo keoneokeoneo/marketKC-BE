@@ -1,4 +1,5 @@
 import { Category } from 'src/category/category.entity';
+import { ChatRoom } from 'src/socket/chatroom.entity';
 import { User } from 'src/user/user.entity';
 import {
   Column,
@@ -55,9 +56,12 @@ export class Post {
   })
   user: User;
 
-  @ManyToOne(() => Category, (category) => category.post)
+  @ManyToOne(() => Category, (category) => category.posts)
   category: Category;
 
   @OneToMany(() => PostImg, (postImg) => postImg.post, { cascade: true })
   postImgs: PostImg[];
+
+  @OneToMany(() => ChatRoom, (chatroom) => chatroom.post)
+  chatrooms: ChatRoom[];
 }
