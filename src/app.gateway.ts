@@ -29,6 +29,7 @@ export class AppGateway
     @MessageBody() data: string,
     @ConnectedSocket() client: Socket,
   ): void {
+    console.log(data);
     this.server.emit('msgToClient', data);
   }
 
