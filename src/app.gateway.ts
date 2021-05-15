@@ -12,7 +12,10 @@ import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
 // Gives us access to the socket.io functionally
-@WebSocketGateway(31, { transports: ['websocket'] })
+@WebSocketGateway(80, {
+  transports: ['websocket'],
+  namespace: 'market-kc-chat',
+})
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
