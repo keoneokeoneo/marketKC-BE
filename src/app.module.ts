@@ -22,7 +22,7 @@ import { PostModule } from './post/post.module';
     PostModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppGateway],
 })
 export class AppModule {
   constructor(private readonly connection: Connection) {}
