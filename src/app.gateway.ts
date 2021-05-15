@@ -17,9 +17,16 @@ import { Logger } from '@nestjs/common';
   namespace: 'market-kc-chat',
 })
 export class AppGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
+
+  createRoom(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
+    client.join(data);
+    client.to(data).emit('roomCreated', { room: data });
+    return { event: 'roomCreated', room: data };
+  }
 
   @SubscribeMessage('test')
   handleTest(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
