@@ -7,10 +7,15 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsResponse,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
-
+import { v4 } from 'uuid';
+type RoomReq = {
+  postID: string;
+  userID: string;
+};
 // Gives us access to the socket.io functionally
 @WebSocketGateway({
   transports: ['websocket'],
@@ -22,10 +27,16 @@ export class AppGateway
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
 
-  createRoom(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-    client.join(data);
-    client.to(data).emit('roomCreated', { room: data });
-    return { event: 'roomCreated', room: data };
+  @SubscribeMessage('createRoom')
+  createRoom(
+    @MessageBody() req: RoomReq,
+    @ConnectedSocket() client: Socket,
+  ): WsResponse<unknown> {
+    const roomName = `chatRoom#${v4()}`;
+    console.log('룸 생성 요청 ', req, roomName);
+    client.join(roomName);
+    client.to(roomName).emit('roomCreated', { room: roomName });
+    return { event: 'roomCreated', data: roomName };
   }
 
   @SubscribeMessage('test')
