@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { string } from 'joi';
-import { userInfo } from 'node:os';
 import { Category } from 'src/category/category.entity';
 import { User } from 'src/user/user.entity';
 import { Post } from './post.entity';
