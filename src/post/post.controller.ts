@@ -34,7 +34,7 @@ export class PostController {
     private categoryService: CategoryService,
   ) {}
 
-  @Get('/feed')
+  @Get()
   async getFeedPosts(@Res() res: Response) {
     try {
       const result = await this.postService.getFeedPosts();
