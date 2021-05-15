@@ -12,7 +12,7 @@ import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
 // Gives us access to the socket.io functionally
-@WebSocketGateway(80, {
+@WebSocketGateway({
   transports: ['websocket'],
   namespace: 'market-kc-chat',
 })
