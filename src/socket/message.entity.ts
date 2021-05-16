@@ -15,4 +15,7 @@ export class Message {
 
   @Column({ type: 'datetime', precision: 6 })
   createdAt: Date;
+
+  @Column({ type: 'varchar', nullable: false })
+  msg: string;
 }

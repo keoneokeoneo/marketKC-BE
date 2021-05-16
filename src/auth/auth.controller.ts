@@ -29,12 +29,8 @@ export class AuthController {
   @Post('/register')
   async addUser(@Body() register: Register, @Res() res: Response) {
     try {
-      const {
-        value,
-        error,
-      }: { value: Register; error?: Joi.ValidationError } = regSchema.validate(
-        register,
-      );
+      const { value, error }: { value: Register; error?: Joi.ValidationError } =
+        regSchema.validate(register);
 
       if (error) {
         Logger.error(error);
@@ -49,7 +45,7 @@ export class AuthController {
           .send('이미 사용중인 이메일입니다.');
       } else {
         await this.userService.addUser(register);
-        return res.status(HttpStatus.CREATED).send('로그인 성공');
+        return res.status(HttpStatus.CREATED).send('회원가입에 성공했습니다.');
       }
     } catch (e) {
       Logger.error(e);

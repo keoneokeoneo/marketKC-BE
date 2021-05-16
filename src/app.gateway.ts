@@ -14,6 +14,7 @@ import { Logger } from '@nestjs/common';
 import { UserService } from './user/user.service';
 import { PostService } from './post/post.service';
 import { SocketService } from './socket/socket.service';
+import { ChatRoom } from './socket/chatroom.entity';
 
 type CreateRoomReq = {
   postID: number;
@@ -22,18 +23,21 @@ type CreateRoomReq = {
 };
 type MsgReq = {
   msg: string;
-  userID: string;
+  senderID: string;
+  chatID: number;
+  postID: number;
+  receiverID: string;
 };
 type MsgRes = {
+  sender: string;
   msg: string;
-  senderID: string;
-  time: string;
+  chatroomID: number;
 };
 
 // Gives us access to the socket.io functionally
 @WebSocketGateway(81, {
   transports: ['websocket'],
-  namespace: 'market-kc-chat',
+  namespace: 's-marcet',
 })
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -46,11 +50,11 @@ export class AppGateway
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
 
-  @SubscribeMessage('roomCreationRequest')
+  @SubscribeMessage('requestNewRoom')
   async createRoom(
     @MessageBody() req: CreateRoomReq,
     @ConnectedSocket() client: Socket,
-  ): Promise<WsResponse<unknown>> {
+  ) {
     console.log('룸 생성 요청 ', req);
     try {
       const chatroom = await this.socketService.getChatRoom(
@@ -60,18 +64,10 @@ export class AppGateway
       );
       if (chatroom) {
         console.log('해당 데이터를 가진 채팅방이 존재합니다.');
-        this.server.emit('test1', '기존 채팅방으로 안내할게요');
-        return {
-          event: 'roomCreationError',
-          data: chatroom.id,
-        };
+        return chatroom.id;
       } else {
         console.log('채팅방이 없습니다. 새로 생성해야합니다.');
-        this.server.emit('test 2', '채팅방 생성할게요');
-        return {
-          event: 'roomCreationSuccess',
-          data: '채팅방 생성해야됩니다.',
-        };
+        return -1;
       }
     } catch (e) {
       console.log(e);
@@ -79,29 +75,58 @@ export class AppGateway
     }
   }
 
-  @SubscribeMessage('test')
-  handleTest(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-    console.log(`In Test => Req : ${data}, ${client.id}`);
-    return data;
+  @SubscribeMessage('login')
+  async handleUserLogin(
+    @MessageBody() userID: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log(`유저가 로그인했습니다. => Req : ${userID}, ${client.id}`);
+    try {
+      const user = await this.socketService.findChatUser(userID);
+      if (user) {
+        console.log('기존 유저 정보를 업데이트합니다.');
+        await this.socketService.updateChatUser(userID, client.id);
+      } else {
+        console.log('신규 정보를 입력합니다');
+        await this.socketService.addChatUser(userID, client.id);
+      }
+    } catch (e) {
+      Logger.error(e);
+      throw e;
+    }
   }
 
   @SubscribeMessage('msgToServer')
-  handleMessage(
+  async handleMessage(
     @MessageBody() data: MsgReq,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(data);
-    const res: MsgRes = {
-      msg: data.msg,
-      senderID: data.userID,
-      time: client.handshake.time,
-    };
-    this.server.emit('msgToClient', res);
-    return {
-      time: client.handshake.time,
-      msg: data.msg,
-      senderID: data.userID,
-    };
+    console.log(data); // 클라이언트로부터 들어온 데이터
+    const { chatID, postID, msg, senderID, receiverID } = data;
+    try {
+      let chatroom: ChatRoom = new ChatRoom();
+      const post = await this.postService.getPost(postID);
+      const buyer = await this.userService.getUserByID(senderID);
+      const seller = await this.userService.getUserByID(receiverID);
+      if (chatID == -1) {
+        // 신규 채팅을 이용한다는 것. 새로운 채팅방을 만들어줘야함
+        // sender:구매자 / receiver:판매자
+
+        chatroom = await this.socketService.addChatRoom(post, seller, buyer);
+      } else {
+        chatroom = await this.socketService.getChatRoomByID(chatID);
+      }
+      console.log(chatroom);
+      const newMsg = await this.socketService.addMsg(chatroom, buyer, msg);
+      const res: MsgRes = {
+        msg: newMsg.msg,
+        sender: newMsg.sender.name,
+        chatroomID: chatroom.id,
+      };
+      this.server.emit('msgToClient', res);
+    } catch (e) {
+      Logger.log(e);
+    }
   }
 
   afterInit(server: Server) {
@@ -114,7 +139,7 @@ export class AppGateway
 
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client Connected : ${client.id}`);
-    console.log(client.handshake);
+    //console.log(client.handshake);
     client.emit('connectionSuccess', `${client.id} 연결`);
   }
 }

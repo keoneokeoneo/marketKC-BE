@@ -49,6 +49,19 @@ export class PostService {
     }
   }
 
+  async getChatPost(postID: number) {
+    const res = await this.postRepository.findOne({ where: { id: postID } });
+    if (!res) return null;
+    return {
+      title: res.title,
+      price: res.price,
+      image: res.postImgs[0].url,
+      user: {
+        name: res.user.name,
+      },
+    };
+  }
+
   async addPost(data: UploadPost, user: User, category: Category) {
     try {
       const newPost = new Post();

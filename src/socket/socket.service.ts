@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Post } from 'src/post/post.entity';
+import { User } from 'src/user/user.entity';
 import { ChatRoom } from './chatroom.entity';
 import { ChatRoomRepository } from './chatroom.repository';
+import { ChatUser } from './chatuser.entity';
+import { ChatUserRepository } from './client.repository';
 import { Message } from './message.entity';
 import { MessageRepository } from './message.repository';
 
@@ -12,13 +16,59 @@ export class SocketService {
     private readonly messageRepository: MessageRepository,
     @InjectRepository(ChatRoom)
     private readonly chatroomRepository: ChatRoomRepository,
+    @InjectRepository(ChatUser)
+    private readonly chatuserRepository: ChatUserRepository,
   ) {}
+
+  async findChatUser(userID: string) {
+    return await this.chatuserRepository.findOne({ where: { userID: userID } });
+  }
+
+  async addChatUser(userID: string, clientID: string) {
+    const newClient = await this.chatuserRepository.create();
+    newClient.clientID = clientID;
+    newClient.userID = userID;
+    newClient.lastActivity = new Date(Date.now());
+    return await this.chatuserRepository.save(newClient);
+  }
+
+  async updateChatUser(userID: string, clientID: string) {
+    return await this.chatuserRepository.update(
+      { userID: userID },
+      { clientID: clientID, lastActivity: new Date(Date.now()) },
+    );
+  }
+
+  async getChatRooms(userID: string) {
+    return await this.chatroomRepository.findAndCount({
+      where: [{ buyer: { id: userID } }, { seller: { id: userID } }],
+    });
+  }
+
   /**
-   * 구/판매자 아이디와 게시글 아이디로 채팅방 조회
+   * 채팅방 생성
    *
-   * @param postID post id
-   * @param postUserID seller user id
-   * @param userID buyer user id
+   * @param post 게시글 아이디
+   * @param seller 판매자 아이디
+   * @param buyer 구매자 아이디
+   */
+  async addChatRoom(post: Post, seller: User, buyer: User) {
+    const res = await this.chatroomRepository.create();
+    const time = new Date(Date.now());
+    res.buyer = buyer;
+    res.seller = seller;
+    res.post = post;
+    res.createdAt = time;
+    res.updatedAt = time;
+    return await this.chatroomRepository.save(res);
+  }
+
+  /**
+   * 채팅방 조회
+   *
+   * @param postID 게시글 아이디
+   * @param postUserID 판매자 아이디
+   * @param userID 구매자 아이디
    */
   async getChatRoom(postID: number, postUserID: string, userID: string) {
     return await this.chatroomRepository.findOne({
@@ -35,6 +85,16 @@ export class SocketService {
       },
     });
   }
+  async getChatRoomByID(id: number) {
+    return await this.chatroomRepository.findOne(id);
+  }
 
-  async addNewChatRoom(postID: number, postUserID: string, userID: string) {}
+  async addMsg(chatroom: ChatRoom, sender: User, msg: string) {
+    const newMsg = await this.messageRepository.create();
+    newMsg.sender = sender;
+    newMsg.chatroom = chatroom;
+    newMsg.createdAt = new Date(Date.now());
+    newMsg.msg = msg;
+    return await this.messageRepository.save(newMsg);
+  }
 }
