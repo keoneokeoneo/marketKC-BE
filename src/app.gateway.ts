@@ -15,6 +15,7 @@ import { UserService } from './user/user.service';
 import { PostService } from './post/post.service';
 import { SocketService } from './socket/socket.service';
 import { ChatRoom } from './socket/chatroom.entity';
+import { User } from './user/user.entity';
 
 type CreateRoomReq = {
   postID: number;
@@ -80,12 +81,17 @@ export class AppGateway
     @MessageBody() userID: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`유저가 로그인했습니다. => Req : ${userID}, ${client.id}`);
+    //console.log(`유저가 로그인했습니다. => Req : ${userID}, ${client.id}`);
     try {
       const user = await this.socketService.findChatUser(userID);
       if (user) {
-        console.log('기존 유저 정보를 업데이트합니다.');
+        //console.log('기존 유저 정보를 업데이트합니다.');
         await this.socketService.updateChatUser(userID, client.id);
+        // 클라이언트가 속한 채팅방 구하기
+        const chatroom = await this.socketService.getChatRoomIDsByUser(userID);
+        // 클라이언트를 현재 속해 있는 채팅방으로 join
+        const rooms = chatroom.map((room) => room.id.toString());
+        client.join(rooms);
       } else {
         console.log('신규 정보를 입력합니다');
         await this.socketService.addChatUser(userID, client.id);
@@ -101,29 +107,49 @@ export class AppGateway
     @MessageBody() data: MsgReq,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(data); // 클라이언트로부터 들어온 데이터
     const { chatID, postID, msg, senderID, receiverID } = data;
     try {
       let chatroom: ChatRoom = new ChatRoom();
+      let text = '';
       const post = await this.postService.getPost(postID);
       const buyer = await this.userService.getUserByID(senderID);
       const seller = await this.userService.getUserByID(receiverID);
       if (chatID == -1) {
         // 신규 채팅을 이용한다는 것. 새로운 채팅방을 만들어줘야함
         // sender:구매자 / receiver:판매자
-
+        text = '신규채팅이용';
         chatroom = await this.socketService.addChatRoom(post, seller, buyer);
       } else {
+        // 기존 채팅을 이용한다는 것
+        text = '기존채팅이용';
         chatroom = await this.socketService.getChatRoomByID(chatID);
       }
-      console.log(chatroom);
-      const newMsg = await this.socketService.addMsg(chatroom, buyer, msg);
-      const res: MsgRes = {
-        msg: newMsg.msg,
-        sender: newMsg.sender.name,
-        chatroomID: chatroom.id,
+      let sender: User;
+      if (chatroom.buyer.id == data.senderID) sender = chatroom.buyer;
+      else if (chatroom.seller.id == data.senderID) sender = chatroom.seller;
+      const response = {
+        id: chatroom.id,
+        createdAt: new Date(Date.now()).toLocaleString(),
+        sender: {
+          id: sender.id,
+          name: sender.name,
+        },
+        msg: msg,
       };
-      this.server.emit('msgToClient', res);
+      await this.socketService.addMsg(chatroom, buyer, msg);
+      client.broadcast
+        .to(chatroom.id.toString())
+        .emit('msgToClientNoti', response);
+      client.broadcast
+        .to(chatroom.id.toString())
+        .emit('msgToClientMerge', chatroom.id);
+      return response;
+      // const newMsg = await this.socketService.addMsg(chatroom, buyer, msg);
+      // const res: MsgRes = {
+      //   msg: newMsg.msg,
+      //   sender: newMsg.sender.name,
+      //   chatroomID: chatroom.id,
+      // };
     } catch (e) {
       Logger.log(e);
     }

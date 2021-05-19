@@ -53,13 +53,17 @@ export class Post {
 
   @ManyToOne(() => User, (user) => user.posts, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   user: User;
 
   @ManyToOne(() => Category, (category) => category.posts)
   category: Category;
 
-  @OneToMany(() => PostImg, (postImg) => postImg.post, { cascade: true })
+  @OneToMany(() => PostImg, (postImg) => postImg.post, {
+    cascade: true,
+    eager: true,
+  })
   postImgs: PostImg[];
 
   @OneToMany(() => ChatRoom, (chatroom) => chatroom.post)

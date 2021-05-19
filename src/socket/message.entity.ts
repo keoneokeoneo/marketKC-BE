@@ -7,10 +7,10 @@ export class Message {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ManyToOne(() => ChatRoom, (chatroom) => chatroom.messages)
+  @ManyToOne(() => ChatRoom, (chatroom) => chatroom.messages, { eager: true })
   chatroom: ChatRoom;
 
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => User, (user) => user.messages, { eager: true })
   sender: User;
 
   @Column({ type: 'datetime', precision: 6 })

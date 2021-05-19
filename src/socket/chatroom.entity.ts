@@ -14,16 +14,18 @@ export class ChatRoom {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ManyToOne(() => User, (buyer) => buyer.buyingChats)
+  @ManyToOne(() => User, (buyer) => buyer.buyingChats, { eager: true })
   buyer: User;
 
-  @ManyToOne(() => User, (seller) => seller.sellingChats)
+  @ManyToOne(() => User, (seller) => seller.sellingChats, { eager: true })
   seller: User;
 
   @ManyToOne(() => Post, (post) => post.chatrooms)
   post: Post;
 
-  @OneToMany(() => Message, (message) => message.chatroom)
+  @OneToMany(() => Message, (message) => message.chatroom, {
+    cascade: true,
+  })
   messages: Message[];
 
   @Column({ type: 'datetime', precision: 6 })

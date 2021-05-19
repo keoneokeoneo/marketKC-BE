@@ -86,7 +86,52 @@ export class SocketService {
     });
   }
   async getChatRoomByID(id: number) {
-    return await this.chatroomRepository.findOne(id);
+    return await this.chatroomRepository.findOne(id, {
+      relations: ['messages', 'post', 'buyer', 'seller'],
+    });
+  }
+
+  async getChatRoomIDsByUser(userID: string) {
+    return await this.chatroomRepository.find({
+      where: [{ buyer: { id: userID } }, { seller: { id: userID } }],
+    });
+  }
+
+  async getChatRoomsByUser(user: User) {
+    const res = await this.chatroomRepository.find({
+      where: [{ buyer: user }, { seller: user }],
+      relations: ['messages', 'buyer', 'seller', 'post'],
+    });
+    if (res.length < 1) return res;
+
+    console.log(res);
+    const data = res.map((data) => ({
+      id: data.id,
+      user:
+        user.id !== data.buyer.id
+          ? {
+              id: data.buyer.id,
+              name: data.buyer.name,
+              profileImgUrl: data.buyer.profileImgUrl,
+            }
+          : {
+              id: data.seller.id,
+              name: data.seller.name,
+              profileImgUrl: data.seller.profileImgUrl,
+            },
+      post: {
+        id: data.post.id,
+        location: data.post.location,
+        imgUrl: data.post.postImgs[0].url,
+      },
+      message:
+        data.messages.length > 1
+          ? data.messages.sort(
+              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+            )[0]
+          : data.messages[0],
+    }));
+    return data;
   }
 
   async addMsg(chatroom: ChatRoom, sender: User, msg: string) {

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PostModule } from 'src/post/post.module';
+import { UserModule } from 'src/user/user.module';
 import { ChatRoomRepository } from './chatroom.repository';
 import { ChatUserRepository } from './client.repository';
 import { MessageRepository } from './message.repository';
@@ -13,6 +15,8 @@ import { SocketService } from './socket.service';
       ChatRoomRepository,
       ChatUserRepository,
     ]),
+    UserModule,
+    PostModule,
   ],
   providers: [SocketService],
   controllers: [SocketController],
