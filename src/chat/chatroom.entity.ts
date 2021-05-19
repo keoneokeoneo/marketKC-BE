@@ -1,13 +1,7 @@
 import { Post } from 'src/post/post.entity';
 import { User } from 'src/user/user.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Message } from './message.entity';
+import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ChatMsg } from './chatmsg.entity';
 
 @Entity('ChatRooms')
 export class ChatRoom {
@@ -23,14 +17,8 @@ export class ChatRoom {
   @ManyToOne(() => Post, (post) => post.chatrooms)
   post: Post;
 
-  @OneToMany(() => Message, (message) => message.chatroom, {
+  @OneToMany(() => ChatMsg, (chatmsg) => chatmsg.chatroom, {
     cascade: true,
   })
-  messages: Message[];
-
-  @Column({ type: 'datetime', precision: 6 })
-  createdAt: Date;
-
-  @Column({ type: 'datetime', precision: 6 })
-  updatedAt: Date;
+  chatMsgs: ChatMsg[];
 }

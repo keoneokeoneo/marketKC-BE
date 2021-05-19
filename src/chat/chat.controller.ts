@@ -8,12 +8,13 @@ import {
 } from '@nestjs/common';
 import { PostService } from 'src/post/post.service';
 import { UserService } from 'src/user/user.service';
-import { SocketService } from './socket.service';
 import { Response } from 'express';
+import { ChatService } from './chat.service';
+
 @Controller('/api/chats')
-export class SocketController {
+export class ChatController {
   constructor(
-    private socketService: SocketService,
+    private chatService: ChatService,
     private userService: UserService,
     private postService: PostService,
   ) {}
@@ -26,7 +27,7 @@ export class SocketController {
         return res
           .status(HttpStatus.NOT_FOUND)
           .send('해당 유저가 존재하지 않습니다.');
-      const rooms = await this.socketService.getChatRoomsByUser(user);
+      const rooms = await this.chatService.getChatRoomsByUser(user);
       if (rooms.length < 1)
         return res
           .status(HttpStatus.NOT_FOUND)
@@ -52,16 +53,16 @@ export class SocketController {
             .send('게시글 정보가 없습니다.');
 
         const data = {
-          id: post.id,
+          id: null,
           messages: [],
           post: {
             id: post.id,
             title: post.title,
             price: post.price,
             postImg: post.postImgs[0].url,
-            postUser: {
-              id: post.user.id,
-              name: post.user.name,
+            seller: {
+              id: post.seller.id,
+              name: post.seller.name,
             },
             status: post.status,
           },
@@ -70,18 +71,18 @@ export class SocketController {
         };
         return res.status(HttpStatus.OK).send(data);
       } else {
-        const chat = await this.socketService.getChatRoomByID(Number(chatID));
+        const chat = await this.chatService.getChatRoomByID(Number(chatID));
         if (!chat)
           return res
             .status(HttpStatus.NOT_FOUND)
             .send('채팅방 정보가 없습니다');
-        const { buyer, seller, post, id, messages } = chat;
+        const { buyer, seller, post, id, chatMsgs } = chat;
         const data = {
           id: id,
-          messages: messages.map((msg) => ({
+          msgs: chatMsgs.map((msg) => ({
             id: msg.id,
-            createdAt: new Date(msg.createdAt),
-            msg: msg.msg,
+            createdAt: new Date(msg.createdAt).toLocaleString(),
+            text: msg.text,
             sender: {
               id: msg.sender.id,
               name: msg.sender.name,
@@ -92,9 +93,9 @@ export class SocketController {
             title: post.title,
             price: post.price,
             postImg: post.postImgs[0].url,
-            postUser: {
-              id: post.user.id,
-              name: post.user.name,
+            seller: {
+              id: post.seller.id,
+              name: post.seller.name,
             },
             status: post.status,
           },

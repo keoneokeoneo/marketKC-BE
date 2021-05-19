@@ -49,11 +49,11 @@ export class AuthService {
 
       await this.userService.updateLastActivity(data.id);
 
-      const newUser = await this.userService.getUserByID(data.id);
+      const user = await this.userService.getUserByID(data.id);
 
       return {
         access_token: this.jwtService.sign(payload),
-        id: newUser.id,
+        id: user.id,
       };
     } catch (e) {
       Logger.error(e);

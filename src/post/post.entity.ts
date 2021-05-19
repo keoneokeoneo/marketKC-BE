@@ -1,15 +1,12 @@
 import { Category } from 'src/category/category.entity';
-import { ChatRoom } from 'src/socket/chatroom.entity';
+import { ChatRoom } from 'src/chat/chatroom.entity';
 import { User } from 'src/user/user.entity';
 import {
   Column,
-  CreateDateColumn,
   Entity,
-  JoinTable,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { PostImg } from './postImg.entity';
 
@@ -26,15 +23,6 @@ export class Post {
 
   @Column('int')
   price: number;
-
-  @Column({ length: 255, default: '' })
-  contractAddr: string;
-
-  @Column({ default: 0 })
-  likes: number;
-
-  @Column({ default: 0 })
-  chats: number;
 
   @Column({ default: 0 })
   views: number;
@@ -55,7 +43,7 @@ export class Post {
     onDelete: 'CASCADE',
     eager: true,
   })
-  user: User;
+  seller: User;
 
   @ManyToOne(() => Category, (category) => category.posts)
   category: Category;

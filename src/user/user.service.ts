@@ -30,7 +30,6 @@ export class UserService {
       regUser.name = register.name;
       regUser.email = register.email;
       regUser.password = encodedPW;
-      regUser.id = uuid();
       regUser.createdAt = date;
       regUser.updatedAt = date;
       regUser.subscribedCategories = userCategories;
@@ -60,6 +59,16 @@ export class UserService {
         where: {
           id: id,
         },
+        select: [
+          'id',
+          'email',
+          'name',
+          'walletAddr',
+          'profileImgUrl',
+          'createdAt',
+          'updatedAt',
+          'subscribedCategories',
+        ],
       });
       return searchedUser;
     } catch (e) {

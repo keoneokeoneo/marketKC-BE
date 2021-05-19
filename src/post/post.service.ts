@@ -20,24 +20,17 @@ export class PostService {
 
   async getPost(id: number) {
     return await this.postRepository.findOne(id, {
-      relations: ['category', 'user', 'postImgs'],
+      relations: ['category', 'seller', 'postImgs'],
     });
   }
 
   async getFeedPosts() {
     try {
       const [result, total] = await this.postRepository.findAndCount({
-        order: { updatedAt: 'DESC' },
-        select: [
-          'id',
-          'title',
-          'location',
-          'updatedAt',
-          'price',
-          'chats',
-          'likes',
-        ],
         relations: ['postImgs'],
+        select: ['title', 'location', 'updatedAt', 'price', 'id'],
+        where: [{ status: '판매중' }],
+        order: { updatedAt: 'DESC' },
       });
 
       return {
@@ -57,7 +50,7 @@ export class PostService {
       price: res.price,
       image: res.postImgs[0].url,
       user: {
-        name: res.user.name,
+        name: res.seller.name,
       },
     };
   }
@@ -85,7 +78,7 @@ export class PostService {
       });
 
       newPost.postImgs = urls;
-      newPost.user = user;
+      newPost.seller = user;
       newPost.category = category;
 
       return await this.postRepository.save(newPost);

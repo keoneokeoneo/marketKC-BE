@@ -2,38 +2,48 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/post/post.entity';
 import { User } from 'src/user/user.entity';
+import { ChatMsg } from './chatmsg.entity';
+import { ChatMsgRepository } from './chatmsg.repository';
 import { ChatRoom } from './chatroom.entity';
 import { ChatRoomRepository } from './chatroom.repository';
-import { ChatUser } from './chatuser.entity';
-import { ChatUserRepository } from './client.repository';
-import { Message } from './message.entity';
-import { MessageRepository } from './message.repository';
+import { Client } from './client.entity';
+import { ClientRepository } from './client.repository';
 
 @Injectable()
-export class SocketService {
+export class ChatService {
   constructor(
-    @InjectRepository(Message)
-    private readonly messageRepository: MessageRepository,
+    @InjectRepository(ChatMsg)
+    private readonly chatmsgRepository: ChatMsgRepository,
     @InjectRepository(ChatRoom)
     private readonly chatroomRepository: ChatRoomRepository,
-    @InjectRepository(ChatUser)
-    private readonly chatuserRepository: ChatUserRepository,
+    @InjectRepository(Client)
+    private readonly clientRepository: ClientRepository,
   ) {}
 
-  async findChatUser(userID: string) {
-    return await this.chatuserRepository.findOne({ where: { userID: userID } });
+  async findClientByID(id: string) {
+    return await this.clientRepository.findOne({ where: { userID: id } });
   }
 
-  async addChatUser(userID: string, clientID: string) {
-    const newClient = await this.chatuserRepository.create();
+  async disconnectClient(id: string) {
+    return await this.clientRepository.update(
+      { clientID: id },
+      {
+        clientID: '',
+        lastActivity: new Date(Date.now()),
+      },
+    );
+  }
+
+  async addClient(userID: string, clientID: string) {
+    const newClient = await this.clientRepository.create();
     newClient.clientID = clientID;
     newClient.userID = userID;
     newClient.lastActivity = new Date(Date.now());
-    return await this.chatuserRepository.save(newClient);
+    return await this.clientRepository.save(newClient);
   }
 
-  async updateChatUser(userID: string, clientID: string) {
-    return await this.chatuserRepository.update(
+  async updateClient(userID: string, clientID: string) {
+    return await this.clientRepository.update(
       { userID: userID },
       { clientID: clientID, lastActivity: new Date(Date.now()) },
     );
@@ -49,17 +59,14 @@ export class SocketService {
    * 채팅방 생성
    *
    * @param post 게시글 아이디
-   * @param seller 판매자 아이디
-   * @param buyer 구매자 아이디
+   * @param sender 구매자 아이디
+   * @param receiver 판매자 아이디
    */
-  async addChatRoom(post: Post, seller: User, buyer: User) {
+  async addChatRoom(post: Post, sender: User, receiver: User) {
     const res = await this.chatroomRepository.create();
-    const time = new Date(Date.now());
-    res.buyer = buyer;
-    res.seller = seller;
+    res.buyer = sender;
+    res.seller = receiver;
     res.post = post;
-    res.createdAt = time;
-    res.updatedAt = time;
     return await this.chatroomRepository.save(res);
   }
 
@@ -100,46 +107,53 @@ export class SocketService {
   async getChatRoomsByUser(user: User) {
     const res = await this.chatroomRepository.find({
       where: [{ buyer: user }, { seller: user }],
-      relations: ['messages', 'buyer', 'seller', 'post'],
+      relations: ['chatMsgs', 'buyer', 'seller', 'post'],
     });
     if (res.length < 1) return res;
 
     console.log(res);
-    const data = res.map((data) => ({
-      id: data.id,
-      user:
-        user.id !== data.buyer.id
-          ? {
-              id: data.buyer.id,
-              name: data.buyer.name,
-              profileImgUrl: data.buyer.profileImgUrl,
-            }
-          : {
-              id: data.seller.id,
-              name: data.seller.name,
-              profileImgUrl: data.seller.profileImgUrl,
-            },
-      post: {
-        id: data.post.id,
-        location: data.post.location,
-        imgUrl: data.post.postImgs[0].url,
-      },
-      message:
-        data.messages.length > 1
-          ? data.messages.sort(
+    const data = res.map((data) => {
+      const msg =
+        data.chatMsgs.length > 1
+          ? data.chatMsgs.sort(
               (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
             )[0]
-          : data.messages[0],
-    }));
+          : data.chatMsgs[0];
+      return {
+        id: data.id,
+        target:
+          user.id !== data.buyer.id
+            ? {
+                id: data.buyer.id,
+                name: data.buyer.name,
+                profileImgUrl: data.buyer.profileImgUrl,
+              }
+            : {
+                id: data.seller.id,
+                name: data.seller.name,
+                profileImgUrl: data.seller.profileImgUrl,
+              },
+        post: {
+          id: data.post.id,
+          location: data.post.location,
+          imgUrl: data.post.postImgs[0].url,
+        },
+        lasgMsg: {
+          id: msg.id,
+          text: msg.text,
+          createdAt: new Date(msg.createdAt).toLocaleString(),
+        },
+      };
+    });
     return data;
   }
 
   async addMsg(chatroom: ChatRoom, sender: User, msg: string) {
-    const newMsg = await this.messageRepository.create();
+    const newMsg = await this.chatmsgRepository.create();
     newMsg.sender = sender;
     newMsg.chatroom = chatroom;
     newMsg.createdAt = new Date(Date.now());
-    newMsg.msg = msg;
-    return await this.messageRepository.save(newMsg);
+    newMsg.text = msg;
+    return await this.chatmsgRepository.save(newMsg);
   }
 }

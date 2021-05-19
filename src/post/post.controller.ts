@@ -64,16 +64,15 @@ export class PostController {
         title: post.title,
         content: post.content,
         price: post.price,
-        likes: post.likes,
-        chats: post.chats,
         views: post.views + 1,
+        status: post.status,
         location: `${tmp[1]} ${tmp[2]}`,
         updatedAt: getDiff(post.updatedAt),
         categoryName: post.category.name,
-        user: {
-          id: post.user.id,
-          name: post.user.name,
-          profileImgUrl: post.user.profileImgUrl,
+        seller: {
+          id: post.seller.id,
+          name: post.seller.name,
+          profileImgUrl: post.seller.profileImgUrl,
         },
         postImgs: post.postImgs,
       };
@@ -117,7 +116,7 @@ export class PostController {
       // 포스트 먼저 생성 - id값 참조를 해야 함
       const newPost = await this.postService.addPost(value, user, category);
 
-      return res.status(HttpStatus.CREATED).send(newPost);
+      return res.status(HttpStatus.CREATED).send('작성완료');
     } catch (e) {
       Logger.error(e);
     }

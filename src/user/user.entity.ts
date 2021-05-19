@@ -1,7 +1,6 @@
 import { S3_BASE_URL } from 'src/config';
 import { Post } from 'src/post/post.entity';
-import { ChatRoom } from 'src/socket/chatroom.entity';
-import { Message } from 'src/socket/message.entity';
+import { ChatRoom } from 'src/chat/chatroom.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ChatMsg } from 'src/chat/chatmsg.entity';
 
 @Entity('Users')
 export class User {
@@ -43,7 +43,7 @@ export class User {
   @Column('simple-array')
   subscribedCategories: number[];
 
-  @OneToMany(() => Post, (post) => post.user, {
+  @OneToMany(() => Post, (post) => post.seller, {
     cascade: true,
   })
   posts: Post[];
@@ -58,6 +58,6 @@ export class User {
   })
   sellingChats: ChatRoom[];
 
-  @OneToMany(() => Message, (message) => message.sender)
-  messages: Message[];
+  @OneToMany(() => ChatMsg, (chatmsg) => chatmsg.sender)
+  chatMsgs: ChatMsg[];
 }

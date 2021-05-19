@@ -29,20 +29,9 @@ export class UserController {
   async getUserData(@Param('id') id: string, @Res() res: Response) {
     try {
       const searchedUser = await this.userService.getUserByID(id);
-
       if (searchedUser) {
         // 검색된 유저가 있음 -> 검색된 유저 정보 전달 (200, ok)
-        const result = {
-          id: searchedUser.id,
-          email: searchedUser.email,
-          name: searchedUser.name,
-          walletAddr: searchedUser.walletAddr,
-          profileImgUrl: searchedUser.profileImgUrl,
-          createdAt: searchedUser.createdAt,
-          updatedAt: searchedUser.updatedAt,
-          subscribedCategories: searchedUser.subscribedCategories.toString(),
-        };
-        return res.status(HttpStatus.OK).send(result);
+        return res.status(HttpStatus.OK).send(searchedUser);
       } else {
         // 검색된 유저가 없음 -> 에러 메세지 전달 (404, not found)
         return res
@@ -68,7 +57,7 @@ export class UserController {
           .status(HttpStatus.NOT_FOUND)
           .send('해당 유저 정보가 존재하지 않습니다.');
 
-      const result = await this.userService.updateUserCategories(id, ids);
+      await this.userService.updateUserCategories(id, ids);
 
       return res.status(HttpStatus.OK).send('수정 성공');
     } catch (e) {
