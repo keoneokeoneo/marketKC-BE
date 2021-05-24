@@ -38,7 +38,7 @@ type MsgRes = {
 };
 
 // Gives us access to the socket.io functionally
-@WebSocketGateway(81, {
+@WebSocketGateway(8080, {
   transports: ['websocket'],
   namespace: 's-marcet',
 })
