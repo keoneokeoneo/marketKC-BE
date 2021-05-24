@@ -23,3 +23,8 @@ export type UpdateUserCategory = {
   id: string;
   ids: number[];
 };
+
+export type UpdateUserWalletAddr = {
+  id: string;
+  walletAddr: string;
+};

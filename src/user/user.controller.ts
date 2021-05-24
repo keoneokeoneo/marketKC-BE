@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
+import { UpdateUserWalletAddr } from './user.type';
 
 @Controller('/api/users')
 export class UserController {
@@ -38,6 +39,29 @@ export class UserController {
           .status(HttpStatus.NOT_FOUND)
           .send('해당 유저 정보가 존재하지 않습니다.');
       }
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  @Patch('/walletAddr')
+  async updateUserWalletAddr(
+    @Body() req: UpdateUserWalletAddr,
+    @Res() res: Response,
+  ) {
+    console.log(req);
+    try {
+      const user = await this.userService.getUserByID(req.id);
+      if (!user)
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send('해당 유저 정보가 존재하지 않습니다.');
+      const result = await this.userService.updateUserWalletAddr(
+        req.id,
+        req.walletAddr,
+      );
+      console.log(result);
+      return res.status(HttpStatus.OK).send('수정 성공 ');
     } catch (e) {
       Logger.error(e);
     }

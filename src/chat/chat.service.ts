@@ -94,7 +94,7 @@ export class ChatService {
   }
   async getChatRoomByID(id: number) {
     return await this.chatroomRepository.findOne(id, {
-      relations: ['messages', 'post', 'buyer', 'seller'],
+      relations: ['chatMsgs', 'post', 'buyer', 'seller'],
     });
   }
 
@@ -111,7 +111,6 @@ export class ChatService {
     });
     if (res.length < 1) return res;
 
-    console.log(res);
     const data = res.map((data) => {
       const msg =
         data.chatMsgs.length > 1
@@ -138,7 +137,7 @@ export class ChatService {
           location: data.post.location,
           imgUrl: data.post.postImgs[0].url,
         },
-        lasgMsg: {
+        lastMsg: {
           id: msg.id,
           text: msg.text,
           createdAt: new Date(msg.createdAt).toLocaleString(),

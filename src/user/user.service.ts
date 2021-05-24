@@ -87,6 +87,18 @@ export class UserService {
     }
   }
 
+  async updateUserWalletAddr(id: string, addr: string) {
+    console.log(id, addr);
+    try {
+      return await this.userRepository.update(
+        { id: id },
+        { walletAddr: addr, updatedAt: new Date(Date.now()) },
+      );
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
   async updateUserCategories(id: string, categories: number[]) {
     try {
       return await this.userRepository.update(

@@ -111,7 +111,7 @@ export class AppGateway
   ) {
     const { chatID, postID, text, senderID, receiverID } = data;
     try {
-      let chatroom: ChatRoom = new ChatRoom();
+      let chatroom: ChatRoom;
       const post = await this.postService.getPost(postID);
       const sender = await this.userService.getUserByID(senderID);
       const receiver = await this.userService.getUserByID(receiverID);
@@ -145,14 +145,24 @@ export class AppGateway
       const newMsg = await this.chatService.addMsg(chatroom, sender, text);
 
       // 상대방에게 새로운 메세지가 왔음을 알림 (sender 제외)
-      client.broadcast.to(chatroom.id.toString()).emit('msgFromClient');
+      client.broadcast.to(chatroom.id.toString()).emit('msgFromClient', {
+        name: newMsg.sender.name,
+        text: newMsg.text,
+      });
 
       // sender의 state변경을 위해 추가하는 이벤트 발생 (만약 상대방이 그 페이지에 머물고 있을 수 있으므로 동시에 발생)
       const res: MsgRes = {
-        ...newMsg,
         createdAt: newMsg.createdAt.toLocaleString(),
+        id: newMsg.id,
+        text: newMsg.text,
+        sender: {
+          id: newMsg.sender.id,
+          name: newMsg.sender.name,
+        },
       };
-      this.server.of(chatroom.id.toString()).emit('newMsgRes', res);
+      console.log(res);
+      this.server.to(chatroom.id.toString()).emit('newMsgRes', res);
+      //this.server.of(chatroom.id.toString()).emit('newMsgRes', res);
     } catch (e) {
       Logger.log(e);
     }
