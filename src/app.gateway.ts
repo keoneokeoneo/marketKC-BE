@@ -13,7 +13,6 @@ import { Logger } from '@nestjs/common';
 import { UserService } from './user/user.service';
 import { PostService } from './post/post.service';
 import { ChatRoom } from './chat/chatroom.entity';
-import { User } from './user/user.entity';
 import { ChatService } from './chat/chat.service';
 
 type CreateRoomReq = {
