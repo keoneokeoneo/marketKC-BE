@@ -121,4 +121,21 @@ export class PostController {
       Logger.error(e);
     }
   }
+
+  @Get('/users/:userID')
+  async getUserPost(@Param('userID') userID: string, @Res() res: Response) {
+    try {
+      const user = await this.userService.getUserByID(userID);
+      if (!user)
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send('해당 정보의 유저가 존재하지 않습니다.');
+
+      const posts = await this.postService.getUserPost(userID);
+
+      return res.status(HttpStatus.OK).send(posts);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }

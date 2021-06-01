@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/category/category.entity';
+import { getDiff } from 'src/dateFormat';
 import { User } from 'src/user/user.entity';
 import { Post } from './post.entity';
 import { PostRepository } from './post.repository';
@@ -20,7 +21,7 @@ export class PostService {
 
   async getPost(id: number) {
     return await this.postRepository.findOne(id, {
-      relations: ['category', 'seller', 'postImgs'],
+      relations: ['category', 'seller', 'postImgs', 'chatrooms'],
     });
   }
 
@@ -85,5 +86,50 @@ export class PostService {
     } catch (e) {
       Logger.error(e);
     }
+  }
+
+  async updateStatus(postID: number, status: '판매중' | '거래중' | '거래완료') {
+    return await this.postRepository.update(
+      { id: postID },
+      { status: status, updatedAt: new Date(Date.now()) },
+    );
+  }
+
+  async getUserPost(userID: string) {
+    const posts = await this.postRepository.find({
+      relations: ['chatrooms'],
+      where: { seller: { id: userID } },
+    });
+
+    if (posts.length < 1) return [];
+
+    return posts.map((post) => {
+      const {
+        id,
+        title,
+        status,
+        updatedAt,
+        chatrooms,
+        location,
+        postImgs,
+        price,
+        seller,
+      } = post;
+
+      return {
+        id: id,
+        title: title,
+        location: location.split(' ')[2],
+        updatedAt: getDiff(updatedAt),
+        status: status,
+        price: price,
+        chats: chatrooms.length,
+        postImg: postImgs[0].url,
+        seller: {
+          id: seller.id,
+          name: seller.name,
+        },
+      };
+    });
   }
 }

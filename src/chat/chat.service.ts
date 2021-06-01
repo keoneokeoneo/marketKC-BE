@@ -110,7 +110,6 @@ export class ChatService {
       relations: ['chatMsgs', 'buyer', 'seller', 'post'],
     });
     if (res.length < 1) return res;
-
     const data = res.map((data) => {
       const msg =
         data.chatMsgs.length > 1

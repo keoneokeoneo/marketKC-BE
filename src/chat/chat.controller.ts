@@ -54,7 +54,7 @@ export class ChatController {
 
         const data = {
           id: null,
-          messages: [],
+          msgs: [],
           post: {
             id: post.id,
             title: post.title,

@@ -7,6 +7,7 @@ import { ormConfig } from './config';
 import { CategoryModule } from './category/category.module';
 import { PostModule } from './post/post.module';
 import { ChatModule } from './chat/chat.module';
+import { TradeModule } from './trade/trade.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ChatModule } from './chat/chat.module';
     CategoryModule,
     PostModule,
     ChatModule,
+    TradeModule,
   ],
   providers: [AppGateway],
 })
